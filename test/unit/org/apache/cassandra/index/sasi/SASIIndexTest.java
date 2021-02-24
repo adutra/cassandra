@@ -1187,12 +1187,18 @@ public class SASIIndexTest
             add(buildCell(age, LongType.instance.decompose(26L), 1000));
             add(buildCell(firstName, AsciiType.instance.decompose("pavel"), 1000));
         }});
+        rm.apply();
 
+        List<Memtable> liveMemtables = store.getTracker().getView().liveMemtables;
         try {
             store.forceBlockingFlush();
             Assert.fail("It was possible to insert data of wrong type into a column!");
         } catch (final Throwable ex) {
             Assert.assertTrue(ex.getMessage().endsWith("Expected exactly 4 bytes, but was 8"));
+        } finally {
+            // don't leave the store in an inconsistent state
+            store.clearUnsafe();
+            liveMemtables.forEach(memtable -> store.getTracker().notifyDiscarded(memtable));
         }
     }
 
