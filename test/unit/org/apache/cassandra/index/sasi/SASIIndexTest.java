@@ -974,7 +974,7 @@ public class SASIIndexTest
         IndexSummaryManager.instance.redistributeSummaries();
         store.forceBlockingFlush();
 
-        Set<String> rows = getIndexed(store, 100, buildExpression(firstName, Operator.LIKE_CONTAINS, UTF8Type.instance.decompose("a")));
+        Set<String> rows = store.runWithCompactionsDisabled(() -> getIndexed(store, 100, buildExpression(firstName, Operator.LIKE_CONTAINS, UTF8Type.instance.decompose("a"))), true, true);
         Assert.assertEquals(rows.toString(), expected, rows.size());
     }
 
