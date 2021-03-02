@@ -26,7 +26,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
@@ -125,7 +124,7 @@ public class SASIIndexTest
     @Before
     public void cleanUp()
     {
-        Keyspace.open(KS_NAME).getColumnFamilyStore(CF_NAME).truncateBlocking();
+        cleanupData();
     }
 
     @Test
@@ -2507,11 +2506,13 @@ public class SASIIndexTest
         return store;
     }
 
-    private void cleanupData()
+    private static void cleanupData()
     {
         Keyspace ks = Keyspace.open(KS_NAME);
-        ks.getColumnFamilyStore(CF_NAME).truncateBlocking();
-        ks.getColumnFamilyStore(CLUSTERING_CF_NAME_1).truncateBlocking();
+        for (ColumnFamilyStore store : ks.getColumnFamilyStores())
+        {
+            store.truncateBlocking();
+        }
     }
 
     private static Set<String> getIndexed(ColumnFamilyStore store, int maxResults, Expression... expressions)
