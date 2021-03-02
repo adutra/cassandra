@@ -119,6 +119,11 @@ public class SASIIndexTest
                                                                                SchemaLoader.clusteringSASICFMD(KS_NAME, CLUSTERING_CF_NAME_2, "location"),
                                                                                SchemaLoader.staticSASICFMD(KS_NAME, STATIC_CF_NAME),
                                                                                SchemaLoader.fullTextSearchSASICFMD(KS_NAME, FTS_CF_NAME))));
+        Keyspace ks = Keyspace.open(KS_NAME);
+        for (ColumnFamilyStore store : ks.getColumnFamilyStores())
+        {
+            store.disableAutoCompaction();
+        }
     }
 
     @Before
