@@ -40,8 +40,7 @@ import org.slf4j.LoggerFactory;
 import com.datastax.driver.core.Session;
 import org.apache.cassandra.distributed.Cluster;
 import org.apache.cassandra.distributed.api.IInvokableInstance;
-import org.apache.cassandra.distributed.shared.NodeToolResultWithOutput;
-import org.apache.cassandra.distributed.util.NodetoolUtils;
+import org.apache.cassandra.distributed.api.NodeToolResult;
 import org.apache.cassandra.utils.Pair;
 
 import static java.util.stream.Collectors.toList;
@@ -124,7 +123,7 @@ public abstract class AbstractNetstatsStreaming extends TestBaseImpl
             final Set<String> outputs = new LinkedHashSet<>();
 
             results.netstatOutputs.stream()
-                                  .map(NodeToolResultWithOutput::getStdout)
+                                  .map(NodeToolResult::getStdout)
                                   .filter(output -> !output.contains("Not sending any streams"))
                                   .filter(output -> output.contains("Receiving") || output.contains("Sending"))
                                   .forEach(outputs::add);
@@ -478,18 +477,18 @@ public abstract class AbstractNetstatsStreaming extends TestBaseImpl
 
     protected static final class NetstatResults
     {
-        private final List<NodeToolResultWithOutput> netstatOutputs = new ArrayList<>();
+        private final List<NodeToolResult> netstatOutputs = new ArrayList<>();
 
-        public void add(NodeToolResultWithOutput result)
+        public void add(NodeToolResult result)
         {
             netstatOutputs.add(result);
         }
 
         public void assertSuccessful()
         {
-            for (final NodeToolResultWithOutput result : netstatOutputs)
+            for (final NodeToolResult result : netstatOutputs)
             {
-                Assert.assertEquals(result.getResult().getRc(), 0);
+                Assert.assertEquals(result.getRc(), 0);
                 Assert.assertTrue(result.getStderr().isEmpty());
             }
         }
@@ -514,7 +513,7 @@ public abstract class AbstractNetstatsStreaming extends TestBaseImpl
             {
                 try
                 {
-                    final NodeToolResultWithOutput result = NodetoolUtils.nodetool(node, false, "netstats");
+                    final NodeToolResult result = node.nodetoolResult(false, "netstats");
 
                     logger.info(node.broadcastAddress().toString() + " " + result.getStdout());
 
