@@ -111,7 +111,7 @@ public abstract class AbstractNetstatsStreaming extends TestBaseImpl
 
             for (int i = 0; i < records; i++)
             {
-                s.execute("INSERT INTO test_table (id) VALUES (" + UUID.randomUUID() + ")");
+                s.execute("INSERT INTO test_table (id) VALUES (" + UUID.randomUUID() + ')');
             }
         }
     }
@@ -200,8 +200,8 @@ public abstract class AbstractNetstatsStreaming extends TestBaseImpl
             {
                 if (sending.sendingHeader != null)
                 {
-                    Assert.assertEquals(sending.sendingHeader.bytesTotalSoFar, (long) sending.sendingSSTable.stream().map(table -> table.bytesSent).reduce(Long::sum).orElseGet(() -> 0L));
-                    Assert.assertTrue(sending.sendingHeader.bytesTotal >= sending.sendingSSTable.stream().map(table -> table.bytesInTotal).reduce(Long::sum).orElseGet(() -> 0L));
+                    Assert.assertEquals(sending.sendingHeader.bytesTotalSoFar, (long) sending.sendingSSTable.stream().map(table -> table.bytesSent).reduce(Long::sum).orElse(0L));
+                    Assert.assertTrue(sending.sendingHeader.bytesTotal >= sending.sendingSSTable.stream().map(table -> table.bytesInTotal).reduce(Long::sum).orElse(0L));
 
                     if (sending.sendingHeader.bytesTotalSoFar != 0)
                     {
@@ -515,7 +515,7 @@ public abstract class AbstractNetstatsStreaming extends TestBaseImpl
                 {
                     final NodeToolResult result = node.nodetoolResult(false, "netstats");
 
-                    logger.info(node.broadcastAddress().toString() + " " + result.getStdout());
+                    logger.info(node.broadcastAddress().toString() + ' ' + result.getStdout());
 
                     if (!sawAnyStreamingOutput)
                     {
@@ -532,12 +532,12 @@ public abstract class AbstractNetstatsStreaming extends TestBaseImpl
 
                     results.add(result);
 
-                    Thread.currentThread().sleep(500);
+                    Thread.sleep(500);
                 }
                 catch (final Exception ex)
                 {
-                    System.out.println(ex.getMessage());
-                    Thread.currentThread().sleep(500);
+                    logger.error(ex.getMessage());
+                    Thread.sleep(500);
                 }
             }
 
