@@ -44,27 +44,16 @@ public final class NodetoolUtils
     public static NodeToolResultWithOutput nodetool(IInvokableInstance inst, boolean withNotifications, String... args)
     {
         return inst.callOnInstance(() -> {
-            PrintStream originalSysOut = System.out;
-            PrintStream originalSysErr = System.err;
-            originalSysOut.flush();
-            originalSysErr.flush();
             ByteArrayOutputStream toolOut = new ByteArrayOutputStream();
             ByteArrayOutputStream toolErr = new ByteArrayOutputStream();
 
             try (PrintStream newOut = new PrintStream(toolOut);
                  PrintStream newErr = new PrintStream(toolErr))
             {
-                System.setOut(newOut);
-                System.setErr(newErr);
                 Instance.DTestNodeTool nodetool = new Instance.DTestNodeTool(withNotifications, new Output(newOut, newErr));
                 int rc = nodetool.execute(args);
                 NodeToolResult result = new NodeToolResult(args, rc, nodetool.getNotifications(), nodetool.getLatestError());
                 return new NodeToolResultWithOutput(result, toolOut, toolErr);
-            }
-            finally
-            {
-                System.setOut(originalSysOut);
-                System.setErr(originalSysErr);
             }
         });
     }
